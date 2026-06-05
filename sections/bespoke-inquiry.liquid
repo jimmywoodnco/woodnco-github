@@ -1,0 +1,381 @@
+<section class="bespoke-inquiry-section">
+  <div class="bespoke-page-width">
+    <div class="bespoke-header">
+      <h1>{{ section.settings.heading }}</h1>
+      <p>{{ section.settings.subheading }}</p>
+    </div>
+
+    <div class="bespoke-card">
+      {% form 'contact', class: 'bespoke-form' %}
+        {% if form.posted_successfully? %}
+          <div class="bespoke-success">
+            Thank you. Your bespoke inquiry has been submitted.
+          </div>
+        {% endif %}
+
+        {% if form.errors %}
+          <div class="bespoke-error">
+            Please check the required fields and try again.
+          </div>
+        {% endif %}
+
+        <div class="bespoke-block">
+          <h2>Project Details</h2>
+
+          <div class="bespoke-grid">
+            <div class="bespoke-field">
+              <label for="ProjectName">Project Name</label>
+              <input id="ProjectName" type="text" name="contact[Project Name]" placeholder="e.g. Skyline Residence">
+            </div>
+
+            <div class="bespoke-field">
+              <label for="ProductInterest">Product of Interest</label>
+              <select id="ProductInterest" name="contact[Product of Interest]">
+                <option value="">Select a category</option>
+                <option value="Single Vanity">Single Vanity</option>
+                <option value="Wide Single Vanity">Wide Single Vanity</option>
+                <option value="Double Vanity">Double Vanity</option>
+                <option value="Other Custom Furniture">Other Custom Furniture</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bespoke-field">
+            <label for="DesiredDimensions">Desired Dimensions</label>
+            <textarea id="DesiredDimensions" name="contact[Desired Dimensions]" placeholder="Specify width, height, depth and clearance requirements..."></textarea>
+          </div>
+        </div>
+
+        <div class="bespoke-block">
+          <h2>Preferred Materials</h2>
+
+          <div class="bespoke-materials">
+            <label class="bespoke-material-card">
+              <input type="radio" name="contact[Preferred Material]" value="White Oak - Smoke 5%">
+              <span class="bespoke-swatch bespoke-smoke"></span>
+              <span>White Oak<br>Smoke 5%</span>
+            </label>
+
+            <label class="bespoke-material-card">
+              <input type="radio" name="contact[Preferred Material]" value="White Oak - Dark Oak">
+              <span class="bespoke-swatch bespoke-dark-oak"></span>
+              <span>White Oak<br>Dark Oak</span>
+            </label>
+
+            <label class="bespoke-material-card">
+              <input type="radio" name="contact[Preferred Material]" value="Walnut">
+              <span class="bespoke-swatch bespoke-walnut"></span>
+              <span>Walnut</span>
+            </label>
+
+            <label class="bespoke-material-card">
+              <input type="radio" name="contact[Preferred Material]" value="Not Sure">
+              <span class="bespoke-swatch bespoke-unsure"></span>
+              <span>Not Sure</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="bespoke-block">
+          <h2>Technical Assets</h2>
+
+          <div class="bespoke-upload-note">
+            <div class="bespoke-upload-icon">↥</div>
+            <strong>Upload Floor Plans or References</strong>
+            <p>Please email drawings, references, or files after submitting this form. Shopify contact forms do not support file uploads by default.</p>
+          </div>
+        </div>
+
+        <div class="bespoke-block">
+          <h2>Concierge Contact</h2>
+
+          <div class="bespoke-grid">
+            <div class="bespoke-field">
+              <label for="FullName">Full Name</label>
+              <input id="FullName" type="text" name="contact[name]" required>
+            </div>
+
+            <div class="bespoke-field">
+              <label for="EmailAddress">Email Address</label>
+              <input id="EmailAddress" type="email" name="contact[email]" required>
+            </div>
+
+            <div class="bespoke-field">
+              <label for="Company">Firm / Company</label>
+              <input id="Company" type="text" name="contact[Firm / Company]">
+            </div>
+
+            <div class="bespoke-field">
+              <label for="Phone">Phone Number</label>
+              <input id="Phone" type="tel" name="contact[Phone Number]">
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" name="contact[Form Type]" value="Bespoke Inquiry">
+
+        <button type="submit" class="bespoke-submit">
+          Submit Bespoke Inquiry
+        </button>
+
+        <p class="bespoke-footnote">
+          Our senior design consultants typically respond within 24–48 business hours.
+        </p>
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+<style>
+.bespoke-inquiry-section {
+  background: #f7f2ea;
+  padding: 70px 0;
+}
+
+.bespoke-page-width {
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.bespoke-header {
+  text-align: center;
+  margin-bottom: 38px;
+}
+
+.bespoke-header h1 {
+  margin: 0 0 12px;
+  font-size: clamp(34px, 5vw, 48px);
+  line-height: 1.05;
+  color: #1e1d1b;
+  font-weight: 800;
+}
+
+.bespoke-header p {
+  max-width: 520px;
+  margin: 0 auto;
+  color: #7b746d;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.bespoke-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 38px;
+  box-shadow: 0 18px 45px rgba(44, 36, 27, .08);
+}
+
+.bespoke-block {
+  margin-bottom: 34px;
+}
+
+.bespoke-block h2 {
+  margin: 0 0 18px;
+  font-size: 16px;
+  color: #3d6f98;
+  font-weight: 800;
+}
+
+.bespoke-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.bespoke-field {
+  margin-bottom: 18px;
+}
+
+.bespoke-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4d4a45;
+  margin-bottom: 8px;
+}
+
+.bespoke-field input,
+.bespoke-field select,
+.bespoke-field textarea {
+  width: 100%;
+  border: 0;
+  background: #f5f3f1;
+  min-height: 48px;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #1f1d1b;
+  border-radius: 2px;
+}
+
+.bespoke-field textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.bespoke-materials {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.bespoke-material-card {
+  background: #f7f5f3;
+  min-height: 90px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  transition: .2s ease;
+}
+
+.bespoke-material-card input {
+  display: none;
+}
+
+.bespoke-material-card:has(input:checked) {
+  border-color: #3d6f98;
+  background: #eef4f8;
+}
+
+.bespoke-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+.bespoke-smoke {
+  background: #d8cdbb;
+}
+
+.bespoke-dark-oak {
+  background: #7a5738;
+}
+
+.bespoke-walnut {
+  background: #4f321f;
+}
+
+.bespoke-unsure {
+  background: #b7bcc0;
+}
+
+.bespoke-material-card span:last-child {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #5c5751;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.bespoke-upload-note {
+  border: 1px dashed #d8d2ca;
+  background: #fff;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  text-align: center;
+  padding: 28px;
+  color: #6e6861;
+}
+
+.bespoke-upload-icon {
+  font-size: 28px;
+  color: #b8b2aa;
+  margin-bottom: 10px;
+}
+
+.bespoke-upload-note strong {
+  color: #4d4a45;
+  font-size: 14px;
+}
+
+.bespoke-upload-note p {
+  max-width: 430px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 8px auto 0;
+}
+
+.bespoke-submit {
+  background: #3d6f98;
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  min-width: 220px;
+  padding: 16px 26px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.bespoke-footnote {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: #8b847b;
+}
+
+.bespoke-success {
+  background: #eef7ef;
+  border: 1px solid #9ec8a4;
+  color: #2f6b3a;
+  padding: 14px 16px;
+  border-radius: 4px;
+  margin-bottom: 22px;
+}
+
+.bespoke-error {
+  background: #fff3ef;
+  border: 1px solid #d8705a;
+  color: #7a2f22;
+  padding: 14px 16px;
+  border-radius: 4px;
+  margin-bottom: 22px;
+}
+
+@media screen and (max-width: 700px) {
+  .bespoke-card {
+    padding: 26px 18px;
+  }
+
+  .bespoke-grid,
+  .bespoke-materials {
+    grid-template-columns: 1fr;
+  }
+
+  .bespoke-submit {
+    width: 100%;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Bespoke Inquiry",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Bespoke Inquiry"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "For architects and designers seeking unique specifications. Our concierge team assists in bringing out-of-scope visions to life through artisan craftsmanship and technical precision."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bespoke Inquiry"
+    }
+  ]
+}
+{% endschema %}

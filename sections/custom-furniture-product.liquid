@@ -1,0 +1,1291 @@
+{% comment %}
+  Custom Furniture Product Page
+  Updated:
+  - Dynamic material/finish map
+  - Kids color image switching
+  - Kids Item Type switcher: Table / Desk
+  - Vanity Type switcher: Single / Wide / Double
+  - Lead time/content metafields
+  - Dimension min/max concierge routing
+{% endcomment %}
+
+{% assign related_single = product.metafields.custom.related_single.value %}
+{% assign related_wide = product.metafields.custom.related_wide.value %}
+{% assign related_double = product.metafields.custom.related_double.value %}
+
+{% assign related_table = product.metafields.custom.related_table.value %}
+{% assign related_desk = product.metafields.custom.related_desk.value %}
+
+{% assign configurator_type = product.metafields.custom.configurator_type.value %}
+{% assign item_type = product.metafields.custom.item_type.value %}
+
+{% assign white_oak_smoke_img = product.metafields.custom.white_oak_smoke.value %}
+{% assign white_oak_dark_img = product.metafields.custom.white_oak_dark.value %}
+{% assign walnut_img = product.metafields.custom.walnut_image.value %}
+
+{% assign green_img = product.metafields.custom.green_image.value %}
+{% assign pink_img = product.metafields.custom.pink_image.value %}
+{% assign blue_img = product.metafields.custom.blue_image.value %}
+{% assign yellow_img = product.metafields.custom.yellow_image.value %}
+
+{% assign accordion_details = product.metafields.custom.accordion_details %}
+{% assign accordion_dimensions = product.metafields.custom.accordion_dimensions %}
+{% assign specs_pdf = product.metafields.custom.specs_pdf.value %}
+{% assign product_info_pdf = product.metafields.custom.product_info_pdf.value %}
+
+{% assign lead_time = product.metafields.custom.lead_time %}
+{% assign production_notes = product.metafields.custom.production_notes %}
+{% assign care_pdf = product.metafields.custom.care_maintenance_pdf.value %}
+{% assign assembly_pdf = product.metafields.custom.assembly_instructions_pdf.value %}
+{% assign photography_notes = product.metafields.custom.photography_notes %}
+
+{% assign material_finish_map = product.metafields.custom.material_finish_map.value %}
+
+<section class="custom-furniture-page">
+  <div class="cf-page-width">
+    <div class="cf-grid">
+
+      <div class="cf-gallery">
+        <div class="cf-main-image">
+          <img
+            id="cfMainImage"
+            src="{% if blue_img != blank %}{{ blue_img | image_url: width: 1400 }}{% elsif green_img != blank %}{{ green_img | image_url: width: 1400 }}{% elsif white_oak_smoke_img != blank %}{{ white_oak_smoke_img | image_url: width: 1400 }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 1400 }}{% endif %}"
+            alt="{{ product.title | escape }}"
+          >
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="cf-carousel">
+            {% for image in product.images %}
+              <button type="button" class="cf-thumb{% if forloop.first %} active{% endif %}" data-image="{{ image | image_url: width: 1400 }}">
+                <img src="{{ image | image_url: width: 300 }}" alt="{{ image.alt | default: product.title | escape }}">
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="cf-description">
+          <h2>{{ section.settings.description_heading }}</h2>
+
+          {% if product.description != blank %}
+            <div class="cf-description-text">
+              {{ product.description }}
+            </div>
+          {% endif %}
+
+          <div class="cf-product-accordion">
+            {% if accordion_details != blank %}
+              <details class="cf-accordion-item">
+                <summary><span>Details</span></summary>
+                <div class="cf-accordion-content">{{ accordion_details | metafield_tag }}</div>
+              </details>
+            {% endif %}
+
+            {% if accordion_dimensions != blank %}
+              <details class="cf-accordion-item">
+                <summary><span>Dimensions</span></summary>
+                <div class="cf-accordion-content">{{ accordion_dimensions | metafield_tag }}</div>
+              </details>
+            {% endif %}
+
+            {% if production_notes != blank %}
+              <details class="cf-accordion-item">
+                <summary><span>Production Notes</span></summary>
+                <div class="cf-accordion-content">{{ production_notes | metafield_tag }}</div>
+              </details>
+            {% endif %}
+
+            {% if photography_notes != blank %}
+              <details class="cf-accordion-item">
+                <summary><span>Photography Notes</span></summary>
+                <div class="cf-accordion-content">{{ photography_notes | metafield_tag }}</div>
+              </details>
+            {% endif %}
+
+            {% if specs_pdf != blank %}
+              <a class="cf-accordion-link" href="{{ specs_pdf.url }}" target="_blank" rel="noopener">
+                <span>Specs</span><span class="cf-link-arrow">›</span>
+              </a>
+            {% endif %}
+
+            {% if product_info_pdf != blank %}
+              <a class="cf-accordion-link" href="{{ product_info_pdf.url }}" target="_blank" rel="noopener">
+                <span>Product Info</span><span class="cf-link-arrow">›</span>
+              </a>
+            {% endif %}
+
+            {% if care_pdf != blank %}
+              <a class="cf-accordion-link" href="{{ care_pdf.url }}" target="_blank" rel="noopener">
+                <span>Care & Maintenance</span><span class="cf-link-arrow">›</span>
+              </a>
+            {% endif %}
+
+            {% if assembly_pdf != blank %}
+              <a class="cf-accordion-link" href="{{ assembly_pdf.url }}" target="_blank" rel="noopener">
+                <span>Assembly Instructions</span><span class="cf-link-arrow">›</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="cf-panel">
+        <form id="customFurnitureForm">
+          <input type="hidden" id="variantId" value="{{ product.selected_or_first_available_variant.id }}">
+          <input type="hidden" id="cfMaterialInput" value="">
+          <input type="hidden" id="cfFinishInput" value="">
+          <input type="hidden" id="cfWidthInput" value="">
+          <input type="hidden" id="cfDepthInput" value="">
+          <input type="hidden" id="cfHeightInput" value="">
+
+          <h1>{{ product.title }}</h1>
+          <p class="cf-subtitle">{{ section.settings.subtitle }}</p>
+
+          {% if lead_time != blank %}
+            <div class="cf-lead-time">
+              <span class="cf-lead-dot"></span>
+              <span>{{ lead_time }}</span>
+            </div>
+          {% endif %}
+
+          {% if configurator_type == 'Kids' %}
+  <div class="cf-group">
+    <label>Type</label>
+    <div class="cf-static-type">
+      {{ item_type | default: product.type | default: 'Kids Item' }}
+    </div>
+  </div>
+{% else %}
+            <div class="cf-group">
+              <label>Vanity Type</label>
+              <div class="cf-options">
+                {% if related_single != blank %}
+                  <button type="button" class="cf-option {% if related_single.id == product.id %}active{% endif %}" data-product-url="{{ related_single.url }}">
+                    Single
+                  </button>
+                {% endif %}
+
+                {% if related_wide != blank %}
+                  <button type="button" class="cf-option {% if related_wide.id == product.id %}active{% endif %}" data-product-url="{{ related_wide.url }}">
+                    Wide Single
+                  </button>
+                {% endif %}
+
+                {% if related_double != blank %}
+                  <button type="button" class="cf-option {% if related_double.id == product.id %}active{% endif %}" data-product-url="{{ related_double.url }}">
+                    Double
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="cf-group">
+            <div class="cf-label-row">
+              <label>Material</label>
+              <span class="cf-selected-value" id="selectedMaterialLabel"></span>
+            </div>
+            <div class="cf-swatch-options" id="materialOptions"></div>
+          </div>
+
+          <div class="cf-group">
+            <div class="cf-label-row">
+              <label>Finish / Color</label>
+              <span class="cf-selected-value" id="selectedColorLabel"></span>
+            </div>
+            <div class="cf-swatch-options" id="finishOptions"></div>
+          </div>
+
+          <div class="cf-group">
+            <label>Custom Size</label>
+
+            <div class="cf-size-field">
+              <div class="cf-size-header">
+                <span>Width</span>
+                <div class="cf-size-input-wrap">
+                  <input type="number" id="widthManual" step="1">
+                  <span>in</span>
+                </div>
+              </div>
+              <input type="range" id="widthRange" step="1">
+              <div class="cf-range-labels">
+                <span id="widthMinLabel"></span>
+                <span id="widthMaxLabel"></span>
+              </div>
+            </div>
+
+            <div class="cf-size-field">
+              <div class="cf-size-header">
+                <span>Depth</span>
+                <div class="cf-size-input-wrap">
+                  <input type="number" id="depthManual" step="1">
+                  <span>in</span>
+                </div>
+              </div>
+              <input type="range" id="depthRange" step="1">
+              <div class="cf-range-labels">
+                <span id="depthMinLabel"></span>
+                <span id="depthMaxLabel"></span>
+              </div>
+            </div>
+
+            <div class="cf-size-field">
+              <div class="cf-size-header">
+                <span>Height</span>
+                <div class="cf-size-input-wrap">
+                  <input type="number" id="heightManual" step="0.25">
+                  <span>in</span>
+                </div>
+              </div>
+              <input type="range" id="heightRange" step="0.25">
+              <div class="cf-range-labels">
+                <span id="heightMinLabel"></span>
+                <span id="heightMaxLabel"></span>
+              </div>
+            </div>
+
+            <div class="cf-custom-size-warning" id="customSizeWarning" hidden>
+              <strong>Custom size required</strong>
+              <p id="customSizeMessage"></p>
+            </div>
+          </div>
+
+          <div class="cf-summary">
+            <h3>Customization Summary</h3>
+
+            <div class="cf-summary-line">
+              <span>{% if configurator_type == 'Kids' %}Type{% else %}Vanity Type{% endif %}</span>
+              <strong id="summaryVanityType">
+                {% if configurator_type == 'Kids' %}
+                  {{ item_type | default: product.type | default: product.title }}
+                {% else %}
+                  {{ product.title }}
+                {% endif %}
+              </strong>
+            </div>
+
+            <div class="cf-summary-line">
+              <span>Material</span>
+              <strong id="summaryMaterial"></strong>
+            </div>
+
+            <div class="cf-summary-line">
+              <span>Finish / Color</span>
+              <strong id="summaryFinish"></strong>
+            </div>
+
+            <div class="cf-summary-line">
+              <span>Width</span>
+              <strong id="summaryWidth"></strong>
+            </div>
+
+            <div class="cf-summary-line">
+              <span>Depth</span>
+              <strong id="summaryDepth"></strong>
+            </div>
+
+            <div class="cf-summary-line">
+              <span>Height</span>
+              <strong id="summaryHeight"></strong>
+            </div>
+          </div>
+
+          <button type="submit" class="cf-add-btn" id="cfAddToCartBtn">Add to Cart</button>
+
+          <a href="{% if section.settings.custom_size_url != blank %}{{ section.settings.custom_size_url }}{% else %}/pages/request-custom-size{% endif %}" class="cf-request-btn" id="cfRequestCustomBtn" hidden>
+            Request Custom Size
+          </a>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+window.customFurnitureImages = {
+  whiteOakSmoke: "{% if white_oak_smoke_img != blank %}{{ white_oak_smoke_img | image_url: width: 1400 }}{% endif %}",
+  whiteOakDark: "{% if white_oak_dark_img != blank %}{{ white_oak_dark_img | image_url: width: 1400 }}{% endif %}",
+  walnut: "{% if walnut_img != blank %}{{ walnut_img | image_url: width: 1400 }}{% endif %}",
+  green: "{% if green_img != blank %}{{ green_img | image_url: width: 1400 }}{% endif %}",
+  pink: "{% if pink_img != blank %}{{ pink_img | image_url: width: 1400 }}{% endif %}",
+  blue: "{% if blue_img != blank %}{{ blue_img | image_url: width: 1400 }}{% endif %}",
+  yellow: "{% if yellow_img != blank %}{{ yellow_img | image_url: width: 1400 }}{% endif %}"
+};
+
+window.customFurnitureSwatches = {
+  smoke: "{% if section.settings.smoke_icon != blank %}{{ section.settings.smoke_icon | image_url: width: 160 }}{% endif %}",
+  darkOak: "{% if section.settings.dark_oak_icon != blank %}{{ section.settings.dark_oak_icon | image_url: width: 160 }}{% endif %}",
+  walnut: "{% if section.settings.walnut_icon != blank %}{{ section.settings.walnut_icon | image_url: width: 160 }}{% endif %}",
+  whiteOak: "{% if section.settings.white_oak_icon != blank %}{{ section.settings.white_oak_icon | image_url: width: 160 }}{% endif %}"
+};
+
+window.materialFinishMapRaw = {{ material_finish_map | default: "White Oak|Smoke 5%,Dark Oak\nWalnut|Walnut" | json }};
+
+window.dimensionSettings = {
+  widthMin: Number({{ product.metafields.custom.width_min.value | default: product.metafields.custom.custom_width_min.value | default: 24 | json }}),
+  widthMax: Number({{ product.metafields.custom.width_max.value | default: product.metafields.custom.custom_width_max.value | default: 36 | json }}),
+  widthDefault: Number({{ product.metafields.custom.width_default.value | default: product.metafields.custom.custom_width_default.value | default: 24 | json }}),
+
+  depthMin: Number({{ product.metafields.custom.depth_min.value | default: product.metafields.custom.custom_depth_min.value | default: 20 | json }}),
+  depthMax: Number({{ product.metafields.custom.depth_max.value | default: product.metafields.custom.custom_depth_max.value | default: 26 | json }}),
+  depthDefault: Number({{ product.metafields.custom.depth_default.value | default: product.metafields.custom.custom_depth_default.value | default: 20 | json }}),
+
+  heightMin: Number({{ product.metafields.custom.height_min.value | default: product.metafields.custom.custom_height_min.value | default: 18.75 | json }}),
+  heightMax: Number({{ product.metafields.custom.height_max.value | default: product.metafields.custom.custom_height_max.value | default: 18.75 | json }}),
+  heightDefault: Number({{ product.metafields.custom.height_default.value | default: product.metafields.custom.custom_height_default.value | default: 18.75 | json }})
+};
+</script>
+
+<style>
+.custom-furniture-page {
+  background: #f7f2ea;
+  padding: 50px 0;
+}
+
+.cf-page-width {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.cf-main-image {
+  background: #f1efeb;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.cf-main-image img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.cf-carousel {
+  display: flex;
+  gap: 14px;
+  margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.cf-thumb {
+  flex: 0 0 150px;
+  border: 2px solid transparent;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cf-thumb.active {
+  border-color: #2f6fa8;
+}
+
+.cf-thumb img {
+  width: 100%;
+  aspect-ratio: 1.15 / 1;
+  object-fit: cover;
+  display: block;
+}
+
+.cf-description {
+  background: #fffaf4;
+  border-radius: 22px;
+  padding: 24px;
+  margin-top: 28px;
+}
+
+.cf-description h2 {
+  margin: 0 0 18px;
+  font-size: 26px;
+}
+
+.cf-description-text {
+  color: #70665e;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.cf-product-accordion {
+  margin-top: 26px;
+  border-top: 1px solid #ded3c7;
+}
+
+.cf-accordion-item,
+.cf-accordion-link {
+  border-bottom: 1px solid #ded3c7;
+}
+
+.cf-accordion-item summary,
+.cf-accordion-link {
+  width: 100%;
+  padding: 19px 0;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 13px;
+  color: #5f5147;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+}
+
+.cf-accordion-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.cf-accordion-item summary::after {
+  content: "+";
+  font-size: 20px;
+  line-height: 1;
+  color: #5f5147;
+}
+
+.cf-accordion-item[open] summary::after {
+  content: "−";
+}
+
+.cf-accordion-content {
+  padding: 0 0 20px;
+  color: #70665e;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.cf-link-arrow {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cf-panel {
+  background: #fffaf4;
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.06);
+  position: sticky;
+  top: 24px;
+}
+
+.cf-panel h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.cf-subtitle {
+  color: #786d65;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.cf-lead-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #eadfd2;
+  border-radius: 999px;
+  padding: 9px 13px;
+  margin: 0 0 22px;
+  color: #5f5147;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cf-lead-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #3f7d4d;
+}
+
+.cf-group {
+  margin-bottom: 24px;
+}
+
+.cf-group label,
+.cf-label-row label {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 12px;
+  font-weight: 700;
+  color: #95897d;
+}
+
+.cf-group > label {
+  margin-bottom: 10px;
+}
+
+.cf-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.cf-label-row label {
+  margin: 0;
+}
+
+.cf-label-row label::after {
+  content: ":";
+  color: #8c8074;
+  font-weight: 500;
+}
+
+.cf-selected-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5f5147;
+}
+.cf-static-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  min-height: 58px;
+  background: #fff;
+  border: 1px solid #2f6fa8;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #5f5147;
+  box-shadow: 0 0 0 3px rgba(47,111,168,.14);
+}
+
+.cf-options,
+.cf-swatch-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cf-option {
+  border: 1px solid #dccfc0;
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cf-option.active,
+.cf-image-option.active {
+  border-color: #2f6fa8;
+  box-shadow: 0 0 0 3px rgba(47,111,168,.14);
+}
+
+.cf-image-option {
+  min-width: 86px;
+  min-height: 58px;
+  border: 1px solid #dccfc0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #5f5147;
+}
+
+.cf-image-option img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.cf-swatch-fallback {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.cf-white-oak { background: #d8b982; }
+.cf-walnut { background: #6b4428; }
+.cf-smoke { background: #e7dfd0; }
+.cf-dark-oak { background: #8a5b35; }
+.cf-paint-grade { background: #d8d1c6; }
+.cf-green { background: #7f9b65; }
+.cf-pink { background: #d8a7b1; }
+.cf-blue { background: #7f9db8; }
+.cf-yellow { background: #d7b955; }
+.cf-default { background: #c9c9c9; }
+
+.cf-size-field {
+  margin-bottom: 18px;
+}
+
+.cf-size-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+  color: #5f5147;
+}
+
+.cf-size-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #eadfd2;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.cf-size-input-wrap input {
+  width: 74px;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  color: #4b4038;
+  text-align: right;
+}
+
+.cf-size-input-wrap input:focus {
+  outline: none;
+}
+
+.cf-size-input-wrap span {
+  font-size: 13px;
+  color: #8a7b70;
+}
+
+.cf-size-field > input[type="range"] {
+  width: 100%;
+}
+
+.cf-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #8a7b70;
+  font-weight: 600;
+}
+
+.cf-custom-size-warning {
+  background: #fff3ef;
+  border: 1px solid #d8705a;
+  color: #7a2f22;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  margin-bottom: 18px;
+}
+
+.cf-custom-size-warning strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.cf-custom-size-warning p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cf-summary {
+  background: #fff;
+  border: 1px solid #eadfd2;
+  border-radius: 18px;
+  padding: 18px;
+  margin: 26px 0;
+}
+
+.cf-summary h3 {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.cf-summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f0e8df;
+}
+
+.cf-summary-line:last-child {
+  border-bottom: 0;
+}
+
+.cf-add-btn,
+.cf-request-btn {
+  width: 100%;
+  border-radius: 12px;
+  padding: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 0;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+}
+
+.cf-add-btn {
+  background: #2f6fa8;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.cf-request-btn {
+  background: #7a2f22;
+  color: #fff;
+  margin-top: 12px;
+}
+
+.cf-add-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media screen and (max-width: 900px) {
+  .cf-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cf-gallery {
+    display: contents;
+  }
+
+  .cf-main-image { order: 1; }
+  .cf-carousel { order: 2; }
+
+  .cf-panel {
+    order: 3;
+    position: static;
+  }
+
+  .cf-description {
+    order: 4;
+    margin-top: 20px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const mainImage = document.getElementById('cfMainImage');
+  const variantInput = document.getElementById('variantId');
+
+  const materialInput = document.getElementById('cfMaterialInput');
+  const finishInput = document.getElementById('cfFinishInput');
+
+  const materialOptions = document.getElementById('materialOptions');
+  const finishOptions = document.getElementById('finishOptions');
+
+  const widthRange = document.getElementById('widthRange');
+  const depthRange = document.getElementById('depthRange');
+  const heightRange = document.getElementById('heightRange');
+
+  const widthManual = document.getElementById('widthManual');
+  const depthManual = document.getElementById('depthManual');
+  const heightManual = document.getElementById('heightManual');
+
+  const widthInput = document.getElementById('cfWidthInput');
+  const depthInput = document.getElementById('cfDepthInput');
+  const heightInput = document.getElementById('cfHeightInput');
+
+  const addToCartBtn = document.getElementById('cfAddToCartBtn');
+  const requestCustomBtn = document.getElementById('cfRequestCustomBtn');
+  const customSizeWarning = document.getElementById('customSizeWarning');
+  const customSizeMessage = document.getElementById('customSizeMessage');
+
+  const dimensions = window.dimensionSettings;
+
+  function parseMaterialFinishMap(raw) {
+    const map = {};
+
+    String(raw || '')
+      .split(/\r?\n/)
+      .map(function(line) { return line.trim(); })
+      .filter(Boolean)
+      .forEach(function(line) {
+        const parts = line.split('|');
+        if (parts.length < 2) return;
+
+        const material = parts[0].trim();
+        const finishes = parts[1].split(',').map(function(item) { return item.trim(); }).filter(Boolean);
+
+        if (material && finishes.length) {
+          map[material] = finishes;
+        }
+      });
+
+    return map;
+  }
+
+  const materialFinishMap = parseMaterialFinishMap(window.materialFinishMapRaw);
+
+  function slugify(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/%/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function getSwatchClass(value) {
+    const slug = slugify(value);
+
+    if (slug === 'white-oak') return 'cf-white-oak';
+    if (slug === 'walnut') return 'cf-walnut';
+    if (slug === 'smoke-5') return 'cf-smoke';
+    if (slug === 'dark-oak') return 'cf-dark-oak';
+    if (slug === 'paint-grade') return 'cf-paint-grade';
+    if (slug === 'green') return 'cf-green';
+    if (slug === 'pink') return 'cf-pink';
+    if (slug === 'blue') return 'cf-blue';
+    if (slug === 'yellow') return 'cf-yellow';
+
+    return 'cf-default';
+  }
+
+  function getSwatchImage(value) {
+    const slug = slugify(value);
+
+    if (slug === 'white-oak') return window.customFurnitureSwatches.whiteOak;
+    if (slug === 'walnut') return window.customFurnitureSwatches.walnut;
+    if (slug === 'smoke-5') return window.customFurnitureSwatches.smoke;
+    if (slug === 'dark-oak') return window.customFurnitureSwatches.darkOak;
+
+    return '';
+  }
+
+  function createOptionButton(type, value, active) {
+    const imageUrl = getSwatchImage(value);
+    const fallbackClass = getSwatchClass(value);
+
+    if (imageUrl) {
+      return '<button type="button" class="cf-image-option ' + (active ? 'active' : '') + '" data-' + type + '="' + value + '"><img src="' + imageUrl + '" alt="' + value + '"><span>' + value + '</span></button>';
+    }
+
+    return '<button type="button" class="cf-image-option ' + (active ? 'active' : '') + '" data-' + type + '="' + value + '"><span class="cf-swatch-fallback ' + fallbackClass + '"></span><span>' + value + '</span></button>';
+  }
+
+  function formatMeasurement(value) {
+    return Number(value) === 18.75 ? '18 3/4' : String(value);
+  }
+
+  function setActive(buttons, currentButton) {
+    buttons.forEach(function(button) {
+      button.classList.remove('active');
+    });
+    currentButton.classList.add('active');
+  }
+
+  function renderMaterialOptions() {
+    if (!Object.keys(materialFinishMap).length) {
+      materialFinishMap['White Oak'] = ['Smoke 5%', 'Dark Oak'];
+      materialFinishMap['Walnut'] = ['Walnut'];
+    }
+
+    const materials = Object.keys(materialFinishMap);
+
+    materialOptions.innerHTML = materials.map(function(material, index) {
+      return createOptionButton('material', material, index === 0);
+    }).join('');
+
+    materialInput.value = materials[0] || '';
+
+    renderFinishOptions(materialInput.value);
+    bindMaterialButtons();
+  }
+
+  function renderFinishOptions(material) {
+    const finishes = materialFinishMap[material] || [];
+
+    finishOptions.innerHTML = finishes.map(function(finish, index) {
+      return createOptionButton('finish', finish, index === 0);
+    }).join('');
+
+    finishInput.value = finishes[0] || '';
+
+    bindFinishButtons();
+    updateImage();
+    updateSummary();
+  }
+
+  function bindMaterialButtons() {
+    document.querySelectorAll('[data-material]').forEach(function(button) {
+      button.addEventListener('click', function () {
+        setActive(document.querySelectorAll('[data-material]'), button);
+        materialInput.value = button.dataset.material;
+        renderFinishOptions(button.dataset.material);
+      });
+    });
+  }
+
+  function bindFinishButtons() {
+    document.querySelectorAll('[data-finish]').forEach(function(button) {
+      button.addEventListener('click', function () {
+        setActive(document.querySelectorAll('[data-finish]'), button);
+        finishInput.value = button.dataset.finish;
+        updateImage();
+        updateSummary();
+      });
+    });
+  }
+
+  function updateImage() {
+    let imageUrl = '';
+    const finishSlug = slugify(finishInput.value);
+
+    if (finishSlug === 'green') imageUrl = window.customFurnitureImages.green;
+    if (finishSlug === 'pink') imageUrl = window.customFurnitureImages.pink;
+    if (finishSlug === 'blue') imageUrl = window.customFurnitureImages.blue;
+    if (finishSlug === 'yellow') imageUrl = window.customFurnitureImages.yellow;
+
+    if (!imageUrl && materialInput.value === 'White Oak' && finishInput.value === 'Smoke 5%') {
+      imageUrl = window.customFurnitureImages.whiteOakSmoke;
+    }
+
+    if (!imageUrl && materialInput.value === 'White Oak' && finishInput.value === 'Dark Oak') {
+      imageUrl = window.customFurnitureImages.whiteOakDark;
+    }
+
+    if (!imageUrl && materialInput.value === 'Walnut') {
+      imageUrl = window.customFurnitureImages.walnut;
+    }
+
+    if (imageUrl && mainImage) {
+      mainImage.src = imageUrl;
+      mainImage.removeAttribute('srcset');
+      mainImage.removeAttribute('sizes');
+    }
+  }
+
+  function getDimensionState() {
+    const widthValue = Number(widthManual.value);
+    const depthValue = Number(depthManual.value);
+    const heightValue = Number(heightManual.value);
+    const issues = [];
+
+    if (widthManual.value !== '' && widthValue < dimensions.widthMin) {
+      issues.push('Width is below the standard minimum of ' + formatMeasurement(dimensions.widthMin) + '".');
+    }
+
+    if (widthManual.value !== '' && widthValue > dimensions.widthMax) {
+      issues.push('Width exceeds the standard maximum of ' + formatMeasurement(dimensions.widthMax) + '".');
+    }
+
+    if (depthManual.value !== '' && depthValue < dimensions.depthMin) {
+      issues.push('Depth is below the standard minimum of ' + formatMeasurement(dimensions.depthMin) + '".');
+    }
+
+    if (depthManual.value !== '' && depthValue > dimensions.depthMax) {
+      issues.push('Depth exceeds the standard maximum of ' + formatMeasurement(dimensions.depthMax) + '".');
+    }
+
+    if (heightManual.value !== '' && heightValue < dimensions.heightMin) {
+      issues.push('Height is below the standard minimum of ' + formatMeasurement(dimensions.heightMin) + '".');
+    }
+
+    if (heightManual.value !== '' && heightValue > dimensions.heightMax) {
+      issues.push('Height exceeds the standard maximum of ' + formatMeasurement(dimensions.heightMax) + '".');
+    }
+
+    return {
+      isCustom: issues.length > 0,
+      issues: issues
+    };
+  }
+
+  function updateRequestCustomUrl() {
+    if (!requestCustomBtn) return;
+
+    const baseUrl = requestCustomBtn.getAttribute('data-base-url') || requestCustomBtn.getAttribute('href') || '/pages/request-custom-size';
+
+    if (!requestCustomBtn.getAttribute('data-base-url')) {
+      requestCustomBtn.setAttribute('data-base-url', baseUrl.split('?')[0]);
+    }
+
+    const finalBaseUrl = requestCustomBtn.getAttribute('data-base-url');
+
+    const params = new URLSearchParams({
+      product: document.getElementById('summaryVanityType').textContent.trim(),
+      material: materialInput.value,
+      finish: finishInput.value,
+      width: widthManual.value,
+      depth: depthManual.value,
+      height: heightManual.value
+    });
+
+    requestCustomBtn.href = finalBaseUrl + '?' + params.toString();
+  }
+
+  function updateDimensionRouting() {
+    const state = getDimensionState();
+
+    updateRequestCustomUrl();
+
+    if (state.isCustom) {
+      customSizeWarning.hidden = false;
+      customSizeMessage.textContent = state.issues.join(' ') + ' Please request a custom quote for this size.';
+      addToCartBtn.hidden = true;
+      addToCartBtn.disabled = true;
+      requestCustomBtn.hidden = false;
+    } else {
+      customSizeWarning.hidden = true;
+      customSizeMessage.textContent = '';
+      addToCartBtn.hidden = false;
+      addToCartBtn.disabled = false;
+      requestCustomBtn.hidden = true;
+    }
+  }
+
+  function syncManualToRange(manualInput, rangeInput) {
+    const manualValue = Number(manualInput.value);
+    const min = Number(rangeInput.min);
+    const max = Number(rangeInput.max);
+
+    if (manualInput.value === '' || isNaN(manualValue)) {
+      updateSummary();
+      return;
+    }
+
+    if (manualValue < min) {
+      rangeInput.value = min;
+    } else if (manualValue > max) {
+      rangeInput.value = max;
+    } else {
+      rangeInput.value = manualValue;
+    }
+
+    updateSummary();
+  }
+
+  function syncRangeToManual(rangeInput, manualInput) {
+    manualInput.value = rangeInput.value;
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const widthLabel = widthManual.value === '' ? '' : formatMeasurement(widthManual.value);
+    const depthLabel = depthManual.value === '' ? '' : formatMeasurement(depthManual.value);
+    const heightLabel = heightManual.value === '' ? '' : formatMeasurement(heightManual.value);
+
+    document.getElementById('selectedMaterialLabel').textContent = materialInput.value;
+    document.getElementById('selectedColorLabel').textContent = finishInput.value;
+
+    document.getElementById('summaryMaterial').textContent = materialInput.value || '—';
+    document.getElementById('summaryFinish').textContent = finishInput.value || '—';
+
+    document.getElementById('summaryWidth').textContent = widthLabel ? widthLabel + '"' : '—';
+    document.getElementById('summaryDepth').textContent = depthLabel ? depthLabel + '"' : '—';
+    document.getElementById('summaryHeight').textContent = heightLabel ? heightLabel + '"' : '—';
+
+    widthInput.value = widthLabel ? widthLabel + ' inches' : '';
+    depthInput.value = depthLabel ? depthLabel + ' inches' : '';
+    heightInput.value = heightLabel ? heightLabel + ' inches' : '';
+
+    updateDimensionRouting();
+  }
+
+  function applyDimensionSettings() {
+    widthRange.min = dimensions.widthMin;
+    widthRange.max = dimensions.widthMax;
+    widthRange.value = dimensions.widthDefault;
+
+    depthRange.min = dimensions.depthMin;
+    depthRange.max = dimensions.depthMax;
+    depthRange.value = dimensions.depthDefault;
+
+    heightRange.min = dimensions.heightMin;
+    heightRange.max = dimensions.heightMax;
+    heightRange.value = dimensions.heightDefault;
+
+    widthManual.removeAttribute('min');
+    widthManual.removeAttribute('max');
+    widthManual.value = dimensions.widthDefault;
+
+    depthManual.removeAttribute('min');
+    depthManual.removeAttribute('max');
+    depthManual.value = dimensions.depthDefault;
+
+    heightManual.removeAttribute('min');
+    heightManual.removeAttribute('max');
+    heightManual.value = dimensions.heightDefault;
+
+    document.getElementById('widthMinLabel').textContent = formatMeasurement(dimensions.widthMin) + '"';
+    document.getElementById('widthMaxLabel').textContent = formatMeasurement(dimensions.widthMax) + '"';
+    document.getElementById('depthMinLabel').textContent = formatMeasurement(dimensions.depthMin) + '"';
+    document.getElementById('depthMaxLabel').textContent = formatMeasurement(dimensions.depthMax) + '"';
+    document.getElementById('heightMinLabel').textContent = formatMeasurement(dimensions.heightMin) + '"';
+    document.getElementById('heightMaxLabel').textContent = formatMeasurement(dimensions.heightMax) + '"';
+
+    updateSummary();
+  }
+
+  document.querySelectorAll('[data-product-url]').forEach(function(button) {
+    button.addEventListener('click', function () {
+      const url = button.dataset.productUrl;
+      if (!url) return;
+
+      if (url !== window.location.pathname && url !== window.location.href) {
+        window.location.href = url;
+      }
+    });
+  });
+
+  document.querySelectorAll('.cf-thumb').forEach(function(button) {
+    button.addEventListener('click', function () {
+      if (!button.dataset.image || !mainImage) return;
+
+      mainImage.src = button.dataset.image;
+      mainImage.removeAttribute('srcset');
+      mainImage.removeAttribute('sizes');
+
+      setActive(document.querySelectorAll('.cf-thumb'), button);
+    });
+  });
+
+  widthRange.addEventListener('input', function () {
+    syncRangeToManual(widthRange, widthManual);
+  });
+
+  depthRange.addEventListener('input', function () {
+    syncRangeToManual(depthRange, depthManual);
+  });
+
+  heightRange.addEventListener('input', function () {
+    syncRangeToManual(heightRange, heightManual);
+  });
+
+  widthManual.addEventListener('input', function () {
+    syncManualToRange(widthManual, widthRange);
+  });
+
+  depthManual.addEventListener('input', function () {
+    syncManualToRange(depthManual, depthRange);
+  });
+
+  heightManual.addEventListener('input', function () {
+    syncManualToRange(heightManual, heightRange);
+  });
+
+  document.getElementById('customFurnitureForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (getDimensionState().isCustom) {
+      updateDimensionRouting();
+      return;
+    }
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [
+          {
+            id: Number(variantInput.value),
+            quantity: 1,
+            properties: {
+              'Item / Vanity Type': document.getElementById('summaryVanityType').textContent.trim(),
+              'Material': materialInput.value,
+              'Finish / Color': finishInput.value,
+              'Width': widthInput.value,
+              'Depth': depthInput.value,
+              'Height': heightInput.value
+            }
+          }
+        ]
+      })
+    })
+    .then(function(response) {
+      if (!response.ok) throw new Error('Add to cart failed');
+      return response.json();
+    })
+    .then(function() {
+      window.location.href = '/cart';
+    })
+    .catch(function(error) {
+      alert('There was an issue adding the product to cart.');
+      console.error(error);
+    });
+  });
+
+  renderMaterialOptions();
+  applyDimensionSettings();
+  updateImage();
+  updateSummary();
+});
+</script>
+
+{% schema %}
+{
+  "name": "Custom Furniture Product",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Customize your furniture with available material, finish, vanity type, and size options."
+    },
+    {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description heading",
+      "default": "Product Details"
+    },
+    {
+      "type": "url",
+      "id": "custom_size_url",
+      "label": "Request custom size page"
+    },
+    {
+      "type": "header",
+      "content": "Option Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "white_oak_icon",
+      "label": "White Oak option image"
+    },
+    {
+      "type": "image_picker",
+      "id": "walnut_icon",
+      "label": "Walnut option image"
+    },
+    {
+      "type": "image_picker",
+      "id": "smoke_icon",
+      "label": "Smoke 5% option image"
+    },
+    {
+      "type": "image_picker",
+      "id": "dark_oak_icon",
+      "label": "Dark Oak option image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Furniture Product"
+    }
+  ]
+}
+{% endschema %}

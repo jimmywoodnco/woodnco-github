@@ -1,0 +1,299 @@
+<section class="home-feature-icons">
+  <div class="hfi-page-width">
+    <div class="hfi-grid">
+      {% for block in section.blocks %}
+        <div class="hfi-item" {{ block.shopify_attributes }}>
+
+          <div class="hfi-icon-wrap">
+            {% if block.settings.icon != blank %}
+              <img
+                src="{{ block.settings.icon | image_url: width: 120 }}"
+                alt="{{ block.settings.title | escape }}"
+                loading="lazy"
+              >
+            {% else %}
+              <span>{{ forloop.index }}</span>
+            {% endif %}
+          </div>
+
+          {% if block.settings.title != blank %}
+            <h3>{{ block.settings.title }}</h3>
+          {% endif %}
+
+          {% if block.settings.text != blank %}
+            <p>{{ block.settings.text }}</p>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+.home-feature-icons {
+  background: {{ section.settings.section_bg }};
+  padding-top: {{ section.settings.padding_top }}px;
+  padding-bottom: {{ section.settings.padding_bottom }}px;
+}
+
+.hfi-page-width {
+  width: min({{ section.settings.page_width }}px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.hfi-grid {
+  display: grid;
+  grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+  gap: {{ section.settings.desktop_gap }}px;
+  text-align: center;
+}
+
+.hfi-item {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.hfi-icon-wrap {
+  width: {{ section.settings.icon_circle_size }}px;
+  height: {{ section.settings.icon_circle_size }}px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: {{ section.settings.icon_bg }};
+  border: 1px solid rgba(112, 86, 66, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hfi-icon-wrap img {
+  width: {{ section.settings.icon_size }}px;
+  height: {{ section.settings.icon_size }}px;
+  object-fit: contain;
+}
+
+.hfi-icon-wrap span {
+  font-weight: 700;
+  color: #7b7068;
+}
+
+.hfi-item h3 {
+  margin: 0 0 14px;
+  font-size: {{ section.settings.heading_size }}px;
+  line-height: 1.2;
+  color: {{ section.settings.heading_color }};
+  font-weight: 500;
+}
+
+.hfi-item p {
+  margin: 0;
+  font-size: {{ section.settings.text_size }}px;
+  line-height: 1.7;
+  color: {{ section.settings.text_color }};
+  max-width: 280px;
+  margin-inline: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .home-feature-icons {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .hfi-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .hfi-item {
+    max-width: 100%;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Home Feature Icons",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "label": "Content width",
+      "min": 900,
+      "max": 1600,
+      "step": 20,
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "desktop_gap",
+      "label": "Desktop spacing",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 20,
+      "max": 140,
+      "step": 2,
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 20,
+      "max": 140,
+      "step": 2,
+      "default": 70
+    },
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#F6F2EC"
+    },
+    {
+      "type": "color",
+      "id": "icon_bg",
+      "label": "Icon circle background",
+      "default": "#ECE2D6"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#5A4C42"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#85766B"
+    },
+
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 36,
+      "step": 1,
+      "default": 21
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Icon Size"
+    },
+    {
+      "type": "range",
+      "id": "icon_circle_size",
+      "label": "Circle size",
+      "min": 40,
+      "max": 100,
+      "step": 2,
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "default": 28
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Add a short description for this feature."
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Home Feature Icons",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Design Authority",
+            "text": "Every piece is born from a legacy of craftsmanship, offering curated, design-led furniture that defines modern interiors."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Structured Customization",
+            "text": "We provide defined parameters for precision, allowing professionals to adapt designs without compromising architectural integrity."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Professional Trust",
+            "text": "Reliable production timelines and meticulous documentation designed to align perfectly with your professional workflow."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
